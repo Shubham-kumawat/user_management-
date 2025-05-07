@@ -1,8 +1,10 @@
 import React from 'react'
 import UserTable from './UserTable'
+import Register from './Register'
 
 function App() {
-  return (<div>
+  return (<div className=" w-full bg-black-100">
+    
       <UserTable/>
     </div>
   )
