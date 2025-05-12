@@ -3,8 +3,9 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router";
-import Register from "./Register.jsx";
+// import Register from "./Register.jsx";
 import UserTable from "./UserTable.jsx";
+import AddUserForm from "./AddUserForm.jsx";
 
 const router = createBrowserRouter([
   {
@@ -12,10 +13,10 @@ const router = createBrowserRouter([
     element: <App />,
   },
 
-  {
-    path:"/user/create",
-    element:<Register/>
-  },
+   {
+     path:"/form",
+     element:<AddUserForm/>
+   },
 
   {
     path:"/user",
