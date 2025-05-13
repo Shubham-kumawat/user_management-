@@ -6,7 +6,8 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 // import Register from "./Register.jsx";
 import UserTable from "./UserTable.jsx";
 import AddUserForm from "./AddUserForm.jsx";
-
+import BlogForm from "./BlogForm.jsx";
+import BlogTable from "./BlogTable.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,7 +23,16 @@ const router = createBrowserRouter([
     path:"/user",
     element:<UserTable/>
   },
-  
+{  path:"/blogs" ,element:<BlogTable />
+
+} ,
+{path:"/blogs/new" ,element:<BlogForm /> 
+},
+{ path:"/blogs/:id", element:<BlogForm />
+} ,
+
+{ path:"/form/:id", element:<AddUserForm />
+,}
 ]);
 
 createRoot(document.getElementById("root")).render(

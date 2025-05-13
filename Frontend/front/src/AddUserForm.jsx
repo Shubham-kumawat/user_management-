@@ -225,8 +225,6 @@
 
 
 
-// AddUserForm.jsx
-import React from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -239,6 +237,8 @@ const schema = yup.object().shape({
   email: yup.string().email().required(),
   phone: yup.string().required(),
   gender: yup.string().required(),
+  dob: yup.date().required("Birthdate is required"),
+  age: yup.number().required("Age is required"),
   city: yup.string().required(),
   university: yup.string().required(),
   imageFile: yup.mixed().required("Image is required"),
@@ -286,6 +286,7 @@ const AddUserForm = ({ onSuccess }) => {
   const onSubmit = async (data) => {
     try {
       // Upload file
+   
       const formData = new FormData();
       formData.append("image", data.imageFile[0]);
 
@@ -299,6 +300,8 @@ const AddUserForm = ({ onSuccess }) => {
         email: data.email,
         phone: data.phone,
         gender: data.gender,
+        dob: new Date(data.dob).toISOString().split('T')[0],
+        age : data.age,
         city: data.city,
         university: data.university,
         filePath,
@@ -337,7 +340,6 @@ const AddUserForm = ({ onSuccess }) => {
 
       alert("User created!");
       reset();
-      onSuccess();
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
@@ -345,18 +347,25 @@ const AddUserForm = ({ onSuccess }) => {
   };
 
   return (
-     <div className="p-6">
-    <Link
-      to="/"
-      className="inline-block mb-4 text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition"
-    >
-      ← Go Back
-    </Link>
-    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4 mb-10 bg-gray-100 p-6 rounded-lg shadow">
+    <div>
+      <div className="flex justify-end mt-4 mb-4">
+         <Link
+                to="/"
+                className="inline-block px-4 py-2 absolute top-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+              >
+                 Go Back
+               </Link>
+      </div>
+
+
+      
+         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4 mb-10 bg-gray-100 p-6 rounded-lg shadow">
       <input {...register("firstName")} placeholder="First Name" />
       <input {...register("lastName")} placeholder="Last Name" />
       <input {...register("email")} placeholder="Email" />
       <input {...register("phone")} placeholder="Phone" />
+      <input type="date"{...register("dob")} placeholder="Date of birth" />
+      <input {...register("age")} placeholder="age" />
       <input {...register("gender")} placeholder="Gender" />
       <input {...register("city")} placeholder="City" />
       <input {...register("university")} placeholder="University" />
@@ -400,7 +409,10 @@ const AddUserForm = ({ onSuccess }) => {
       </div>
     </form>
     </div>
+ 
   );
 };
 
-export default AddUserForm;
+export default AddUserForm; 
+
+
