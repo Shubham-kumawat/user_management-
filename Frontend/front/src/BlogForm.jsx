@@ -18,6 +18,7 @@ const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
   description: yup.string().required("Description is required"),
   author: yup.string().required("Author name is required"),
+
 });
 
 const BlogForm = () => {
@@ -27,6 +28,10 @@ const BlogForm = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(mode === "edit" || mode === "view");
   const isViewMode = mode === "view";
+  const [createdAt, setCreatedAt] = useState("");
+const [updatedAt, setUpdatedAt] = useState("");
+
+
 
   const {
     register,
@@ -46,6 +51,9 @@ const BlogForm = () => {
           setValue("title", blog.title);
           setValue("description", blog.description);
           setValue("author", blog.author);
+          nh
+          
+
         })
         .catch((err) => console.error("Failed to fetch blog:", err))
         .finally(() => setLoading(false));
@@ -119,6 +127,18 @@ const BlogForm = () => {
             helperText={errors.author?.message}
             disabled={isViewMode}
           />
+                  <TextField
+          label="Created At"
+          value={new Date().toISOString().split('T')[0]}
+          fullWidth
+          disabled
+        />
+        <TextField
+          label="Updated At"
+          value={new Date().toISOString().split('T')[0]}
+          fullWidth
+          disabled
+        />
 
           {!isViewMode && (
             <Button
