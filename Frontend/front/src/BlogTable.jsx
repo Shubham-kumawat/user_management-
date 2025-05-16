@@ -114,6 +114,16 @@ useEffect(() => {
                     {blog.description?.slice(0, 100)}...
                   </TableCell>
                   <TableCell>{blog.author}</TableCell>
+  <TableCell>
+  {blog.tags && blog.tags.length > 0 && blog.tags.map((tag, index) => (
+    <span key={index} style={{ marginRight: 5 }}>
+      #{tag}
+    </span>
+  ))}
+</TableCell>
+
+
+
                   <TableCell>
                     {new Date(blog.createdAt).toLocaleDateString()}
                   </TableCell>

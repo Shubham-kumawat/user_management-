@@ -15,7 +15,14 @@ const __dirname = dirname(__filename);
 const fastify = Fastify({ logger: true });
 const pump = promisify(pipeline);
 
-await fastify.register(cors);
+
+
+
+await fastify.register(cors, {
+  origin: 'http://localhost:5173', // allow frontend origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // explicitly allow DELETE
+});
+
 await fastify.register(multipart);
 await fastify.register(db);
 
@@ -96,42 +103,98 @@ fastify.get('/users/:id', async (request, reply) => {
 });
 
 // Create blog
-fastify.post('/blogs', async (request, reply) => {
+// fastify.post('/blogs', async (req, reply) => {
+//   try {
+//     const data = await req.file(); // Get uploaded file
+//     const fields = data.fields;    // Fix: fetch fields from multipart data
+
+//     const filename = `${nanoid()}.${data.filename.split('.').pop()}`;
+//     const filePath = path.join(uploadDir, filename);
+
+//     await pump(data.file, fs.createWriteStream(filePath));
+
+//     const blog = {
+//       title: fields.title.value,
+//       description: fields.description.value,
+//       author: fields.author.value,
+//       tags:[],
+//       image: `/uploads/${filename}`,
+//       createdAt: new Date(),
+//       updatedAt: new Date(),
+//     };
+
+//     const result = await fastify.mongo.db.collection('blogs').insertOne(blog);
+
+//     return reply.code(201).send({
+//       ...blog,
+//       _id: result.insertedId,
+//     });
+//   } catch (error) {
+//     fastify.log.error(error);
+//     return reply.code(500).send({ error: 'Internal Server Error' });
+//   }
+// });
+
+fastify.post('/blogs', async (req, reply) => {
   try {
-    const { title, description, author } = request.body;
-    const result = await fastify.mongo.db
-      .collection('blogs')
-      .insertOne({
-        title,
-        description,
-        author,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+    const parts = req.parts();
+
+    const blog = {
+      title: '',
+      description: '',
+      author: '',
+      tags: [],
+      image: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    for await (const part of parts) {
+      if (part.file) {
+        // File part
+        const filename = `${nanoid()}.${part.filename.split('.').pop()}`;
+        const filePath = path.join(uploadDir, filename);
+        await pump(part.file, fs.createWriteStream(filePath));
+        blog.image = `/uploads/${filename}`;
+      } else {
+        // Field part
+        if (part.fieldname === 'tags') {
+          try {
+            blog.tags = JSON.parse(part.value);  // frontend se JSON string me aayega tags
+          } catch {
+            blog.tags = [];
+          }
+        } else {
+          blog[part.fieldname] = part.value;
+        }
+      }
+    }
+
+    const result = await fastify.mongo.db.collection('blogs').insertOne(blog);
 
     return reply.code(201).send({
+      ...blog,
       _id: result.insertedId,
-      title,
-      description,
-      author,
     });
   } catch (error) {
-    console.error('Failed to create blog:', error);
+    fastify.log.error(error);
     return reply.code(500).send({ error: 'Internal Server Error' });
   }
 });
 
 
+
+
+
 fastify.get('/blogs', async (_, reply) => {
   try {
-    const blogs = await fastify.mongo.db.collection('blogs').find().toArray(); // ✅ lowercase
+    const blogs = await fastify.mongo.db.collection('blogs').find().toArray();
     return reply.send(blogs);
   } catch (err) {
     fastify.log.error(err);
-    return reply.status(500).send({ error: 'Failed to fetch blogs' });
+    return reply.status(500).send({ error: 'Failed to fetch users' });
   }
 });
-
 
 // Get single blog by ID
 // Get single blog by ID
@@ -155,14 +218,30 @@ fastify.get('/blogs/:id', async (request, reply) => {
 
 
 // Update blog by ID
-fastify.put('/blogs/:id', async (request, reply) => {
+fastify.put('/blogs/:id', async (req, reply) => {
   try {
-    const { id } = request.params;
-    const { title, description, author } = request.body;
+    const { id } = req.params;
+
+    const data = await req.file();
+    const fields = req.body;
+
+    const updateData = {
+      title: fields.title,
+      description: fields.description,
+      author: fields.author,
+      updatedAt: new Date(),
+    };
+
+    if (data) {
+      const filename = `${nanoid()}.${data.filename.split('.').pop()}`;
+      const filePath = path.join(uploadDir, filename);
+      await pump(data.file, fs.createWriteStream(filePath));
+      updateData.image = `/uploads/${filename}`;
+    }
 
     const result = await fastify.mongo.db.collection('blogs').updateOne(
       { _id: new fastify.mongo.ObjectId(id) },
-      { $set: { title, description, author, updatedAt: new Date() } }
+      { $set: updateData }
     );
 
     if (result.matchedCount === 0) {
@@ -170,9 +249,9 @@ fastify.put('/blogs/:id', async (request, reply) => {
     }
 
     return reply.send({ success: true, message: 'Blog updated successfully' });
-  } catch (err) {
-    fastify.log.error(err);
-    return reply.status(500).send({ error: 'Failed to update blog' });
+  } catch (error) {
+    fastify.log.error(error);
+    return reply.code(500).send({ error: 'Failed to update blog' });
   }
 });
 
