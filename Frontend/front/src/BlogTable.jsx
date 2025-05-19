@@ -9,6 +9,7 @@ import {
   TablePagination,
   TableRow,
   Toolbar,
+  TextField,
   Typography,
   Paper,
   IconButton,
@@ -28,6 +29,8 @@ const headCells = [
   { id: "description", label: "Description" },
   { id: "author", label: "Author" },
   { id: "tags", label: "Tags" },
+    { id: "category", label: "Category" }, 
+
   { id: "createdAt", label: "Created Date" },
   { id: "updatedAt", label: "Updated Date" },
   { id: "actions", label: "Actions" },
@@ -38,6 +41,9 @@ export default function BlogTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const navigate = useNavigate();
+
+const [searchTerm, setSearchTerm] = useState("");
+
 
 useEffect(() => {
   const fetchBlogs = async () => {
@@ -76,14 +82,40 @@ useEffect(() => {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - blogs.length) : 0;
 
-  const visibleRows = blogs.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
+
+const filteredBlogs = blogs.filter((blog) => {
+  const search = searchTerm.toLowerCase();
+  return (
+    blog.title.toLowerCase().includes(search) ||
+    blog.author.toLowerCase().includes(search) ||
+    blog.category?.toLowerCase().includes(search) ||
+    blog.tags?.join(" ").toLowerCase().includes(search)
   );
+});
+const visibleRows = filteredBlogs.slice(
+  page * rowsPerPage,
+  page * rowsPerPage + rowsPerPage
+);
+
+
+ 
 
   return (
     <Box className="w-[90%] mx-auto mt-12">
       <Paper sx={{ width: "100%", mb: 2, p: 2 }}>
+
+       <TextField
+  size="small"
+  label="Search Blogs"
+  variant="outlined"
+  value={searchTerm}
+  onChange={(e) => {
+    setSearchTerm(e.target.value);
+    setPage(0);
+  }}
+  sx={{ flexGrow: 1, marginRight: 2 }}
+/>
+
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Blog List
@@ -122,6 +154,11 @@ useEffect(() => {
     </span>
   ))}
 </TableCell>
+
+<TableCell>{blog.category || "N/A"}</TableCell>
+
+
+
 
 
 
@@ -162,7 +199,7 @@ useEffect(() => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={blogs.length}
+          count={filteredBlogs.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

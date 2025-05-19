@@ -102,38 +102,50 @@ fastify.get('/users/:id', async (request, reply) => {
   }
 });
 
-// Create blog
-// fastify.post('/blogs', async (req, reply) => {
-//   try {
-//     const data = await req.file(); // Get uploaded file
-//     const fields = data.fields;    // Fix: fetch fields from multipart data
 
-//     const filename = `${nanoid()}.${data.filename.split('.').pop()}`;
-//     const filePath = path.join(uploadDir, filename);
+// Update user by ID
+fastify.put('/users/:id', async (request, reply) => {
+  try {
+    const { id } = request.params;
+    const updatedData = request.body;
 
-//     await pump(data.file, fs.createWriteStream(filePath));
+    const result = await fastify.mongo.db.collection('Users').updateOne(
+      { _id: new fastify.mongo.ObjectId(id) },
+      { $set: updatedData }
+    );
 
-//     const blog = {
-//       title: fields.title.value,
-//       description: fields.description.value,
-//       author: fields.author.value,
-//       tags:[],
-//       image: `/uploads/${filename}`,
-//       createdAt: new Date(),
-//       updatedAt: new Date(),
-//     };
+    if (result.matchedCount === 0) {
+      return reply.status(404).send({ error: 'User not found' });
+    }
 
-//     const result = await fastify.mongo.db.collection('blogs').insertOne(blog);
+    return reply.send({ success: true, message: 'User updated successfully' });
+  } catch (err) {
+    fastify.log.error(err);
+    return reply.status(500).send({ error: 'Failed to update user' });
+  }
+});
 
-//     return reply.code(201).send({
-//       ...blog,
-//       _id: result.insertedId,
-//     });
-//   } catch (error) {
-//     fastify.log.error(error);
-//     return reply.code(500).send({ error: 'Internal Server Error' });
-//   }
-// });
+// Delete user by ID
+fastify.delete('/users/:id', async (request, reply) => {
+  try {
+    const { id } = request.params;
+
+    const result = await fastify.mongo.db.collection('Users').deleteOne({
+      _id: new fastify.mongo.ObjectId(id),
+    });
+
+    if (result.deletedCount === 0) {
+      return reply.status(404).send({ error: 'User not found' });
+    }
+
+    return reply.send({ success: true, message: 'User deleted successfully' });
+  } catch (err) {
+    fastify.log.error(err);
+    return reply.status(500).send({ error: 'Failed to delete user' });
+  }
+});
+
+
 
 fastify.post('/blogs', async (req, reply) => {
   try {
@@ -197,25 +209,6 @@ fastify.get('/blogs', async (_, reply) => {
   }
 });
 
-// Get single blog by ID
-// Get single blog by ID
-// fastify.get('/blogs/:id', async (request, reply) => {
-//   try {
-//     const { id } = request.params;
-//     const blog = await fastify.mongo.db.collection('blogs').findOne({
-//       _id: new fastify.mongo.ObjectId(id),
-//     });
-
-//     if (!blog) {
-//       return reply.code(404).send({ error: 'Blog not found' });
-//     }
-
-//     return reply.send(blog);
-//   } catch (error) {
-//     fastify.log.error(error);
-//     return reply.code(500).send({ error: 'Failed to fetch blog' });
-//   }
-// });
 
 fastify.get('/blogs/:id', async (request, reply) => {
   try {
@@ -296,47 +289,6 @@ fastify.put('/blogs/:id', async (req, reply) => {
   }
 });
 
-
-
-// Update blog by ID
-// fastify.put('/blogs/:id', async (req, reply) => {
-//   try {
-//     const { id } = req.params;
-
-//     const data = await req.file();
-//     const fields = req.body;
-
-//     const updateData = {
-//       title: fields.title,
-//       description: fields.description,
-//       author: fields.author,
-//       tags:fields.tags,
-//       category: fields.category,
-//       updatedAt: new Date(),
-//     };
-
-//     if (data) {
-//       const filename = `${nanoid()}.${data.filename.split('.').pop()}`;
-//       const filePath = path.join(uploadDir, filename);
-//       await pump(data.file, fs.createWriteStream(filePath));
-//       updateData.image = `/uploads/${filename}`;
-//     }
-
-//     const result = await fastify.mongo.db.collection('blogs').updateOne(
-//       { _id: new fastify.mongo.ObjectId(id) },
-//       { $set: updateData }
-//     );
-
-//     if (result.matchedCount === 0) {
-//       return reply.status(404).send({ error: 'Blog not found' });
-//     }
-
-//     return reply.send({ success: true, message: 'Blog updated successfully' });
-//   } catch (error) {
-//     fastify.log.error(error);
-//     return reply.code(500).send({ error: 'Failed to update blog' });
-//   }
-// });
 
 // Delete blog by ID
 fastify.delete('/blogs/:id', async (request, reply) => {
