@@ -8,6 +8,7 @@ import UserTable from "./UserTable.jsx";
 import AddUserForm from "./AddUserForm.jsx";
 import BlogForm from "./BlogForm.jsx";
 import BlogTable from "./BlogTable.jsx";
+import TagManager from "./TagManager.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -32,7 +33,11 @@ const router = createBrowserRouter([
 } ,
 
 { path:"/form/:id", element:<AddUserForm />
-,}
+},
+
+{ path:"/tags", element:<TagManager />
+} ,
+
 ]);
 
 createRoot(document.getElementById("root")).render(

@@ -154,27 +154,37 @@ const BlogForm = () => {
         
 <form onSubmit={handleSubmit(onSubmit)} noValidate>
   <Stack spacing={3}>
-    <input
-      type="file"
-      {...register("imageFile")}
-      disabled={isViewMode}
-      accept="image/*"
-      onChange={handleImageChange}
+   <Box
+  sx={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    mb: 2,  // margin bottom for spacing
+  }}
+>
+  <input
+    type="file"
+    {...register("imageFile")}
+    disabled={isViewMode}
+    accept="image/*"
+    onChange={handleImageChange}
+    style={{ marginBottom: '8px' }}
+  />
+
+  {errors.imageFile && (
+    <Typography color="error" align="center" sx={{ mb: 1 }}>
+      {errors.imageFile.message}
+    </Typography>
+  )}
+
+  {imagePreview && (
+    <img
+      src={imagePreview}
+      alt="Image Preview"
+      style={{ width: "150px", borderRadius: "8px" }}
     />
-
-    {errors.imageFile && (
-      <Typography color="error">{errors.imageFile.message}</Typography>
-    )}
-
-    {imagePreview && (
-      <Box>
-        <img
-          src={imagePreview}
-          alt="Image Preview"
-          style={{ width: "150px", borderRadius: "8px" }}
-        />
-      </Box>
-    )}
+  )}
+</Box>
 
     <TextField
       label="Title"

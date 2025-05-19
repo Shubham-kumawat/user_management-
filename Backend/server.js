@@ -196,6 +196,43 @@ fastify.post('/blogs', async (req, reply) => {
 });
 
 
+//tags
+// fastify.post('/tags')
+fastify.post('/tags', async (request, reply) => {
+  try {
+    const { tags } = request.body;
+    if (!Array.isArray(tags)) {
+      return reply.status(400).send({ error: 'Tags must be an array.' });
+    }
+
+    const operations = tags.map(tag => ({
+      updateOne: {
+        filter: { name: tag.toLowerCase() },
+        update: { $setOnInsert: { name: tag.toLowerCase() } },
+        upsert: true,
+      }
+    }));
+
+    await fastify.mongo.db.collection('tags').bulkWrite(operations);
+    return reply.code(201).send({ success: true });
+  } catch (error) {
+    console.error(error);
+    return reply.code(500).send({ error: 'Failed to save tags' });
+  }
+});
+
+
+// fastify.get('/tags')
+fastify.get('/tags', async (req, reply) => {
+  try {
+    const tags = await fastify.mongo.db.collection('tags').find().toArray();
+    return reply.send(tags); // [{ name: 'reactjs' }, ...]
+  } catch (err) {
+    console.error(err);
+    return reply.code(500).send({ error: 'Failed to fetch tags' });
+  }
+});
+
 
 
 
