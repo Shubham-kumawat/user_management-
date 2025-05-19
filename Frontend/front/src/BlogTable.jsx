@@ -27,6 +27,7 @@ const headCells = [
   { id: "title", label: "Title" },
   { id: "description", label: "Description" },
   { id: "author", label: "Author" },
+  { id: "tags", label: "Tags" },
   { id: "createdAt", label: "Created Date" },
   { id: "updatedAt", label: "Updated Date" },
   { id: "actions", label: "Actions" },
