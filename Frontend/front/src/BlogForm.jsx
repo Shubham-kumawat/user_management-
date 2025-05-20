@@ -7,14 +7,14 @@ import {
   Paper,
   CircularProgress,
   MenuItem,
+
 } from "@mui/material";
    import { Stack } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { useForm,Controller } from "react-hook-form";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
-import TagSelector from "./TagSelector";
 import CategorySelector from "./CategorySelector";
 
 // Validation Schema
@@ -40,7 +40,7 @@ const BlogForm = () => {
 
   const [loading, setLoading] = useState(mode === "edit" || mode === "view");
   const [tags, setTags] = useState([]);
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState([]);
   const [users, setUsers] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -48,6 +48,7 @@ const BlogForm = () => {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema(mode)),
@@ -59,6 +60,17 @@ const BlogForm = () => {
       .get("http://localhost:3000/users")
       .then((res) => setUsers(res.data))
       .catch((err) => console.error("Failed to fetch users", err));
+
+  axios
+      .get("http://localhost:3000/category")
+      .then((res) => setCategory(res.data))
+      .catch((err) => console.error("Failed to fetch users", err));
+
+ axios
+      .get("http://localhost:3000/tags")
+      .then((res) => setTags(res.data))
+      .catch((err) => console.error("Failed to fetch users", err));
+
   }, []);
 
   // Fetch blog if edit/view
@@ -222,27 +234,63 @@ const BlogForm = () => {
       ))}
     </TextField>
 
-    <TagSelector value={tags} onChange={setTags} disabled={isViewMode} />
 
-    {isViewMode ? (
-      <TextField
-        label="Category"
-        variant="outlined"
-        fullWidth
-        value={category || "No category available"}
-        InputProps={{ readOnly: true }}
-        sx={{
-          bgcolor: category ? "background.paper" : "#f0f0f0",
-          color: category ? "text.primary" : "text.disabled",
-        }}
-      />
-    ) : (
-      <CategorySelector
-        value={category}
-        onChange={setCategory}
-        disabled={false}
-      />
-    )}
+<Controller
+  name="category"
+  control={control}
+  rules={{ required: "Category is required" }}
+  render={({ field }) => (
+    <TextField
+      select
+      label="Select Category"
+      fullWidth
+      {...field}
+      error={!!errors.category}
+      helperText={errors.category?.message}
+      disabled={isViewMode}
+      InputLabelProps={{
+        shrink: !!field.value, // ✅ Yeh line fix karega
+      }}
+
+    >
+      {category.map((cat) => (
+        <MenuItem key={cat._id} value={cat.catName}>
+          {cat.catName}
+        </MenuItem>
+      ))}
+    </TextField>
+  )}
+/>
+
+
+        {/* Tags - Multi Select */}
+        <Controller
+  name="tags"
+  control={control}
+  rules={{ required: "At least one tag is required" }}
+  InputLabelProps={{
+    shrink: true,
+  }}
+  render={({ field }) => (
+    <TextField
+      select
+      label="Select Tags"
+      defaultValue={[]}
+      fullWidth
+      SelectProps={{ multiple: true }}
+      {...field}
+      error={!!errors.tags}
+      helperText={errors.tags?.message}
+      disabled={isViewMode}
+    >
+      {tags.map((tag) => (
+        <MenuItem key={tag._id} value={tag.tagName}>
+          {tag.tagName}
+        </MenuItem>
+      ))}
+    </TextField>
+  )}
+/>
 
     {!isViewMode && (
       <Button type="submit" variant="contained" color="primary" fullWidth>

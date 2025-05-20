@@ -32,7 +32,7 @@ const TagManager = () => {
           <TableBody>
             {tags.map((tag, index) => (
               <TableRow key={index}>
-                <TableCell>#{tag.name}</TableCell>
+                <TableCell>{tag.tagName}</TableCell>
               </TableRow>
             ))}
           </TableBody>

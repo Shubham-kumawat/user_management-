@@ -25,6 +25,8 @@ await fastify.register(cors, {
 
 await fastify.register(multipart);
 await fastify.register(db);
+const tagCollection = fastify.mongo.db.collection('tags')
+const categoriesCollection = fastify.mongo.db.collection("categories")
 
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -155,8 +157,8 @@ fastify.post('/blogs', async (req, reply) => {
       title: '',
       description: '',
       author: '',
-      tags: [],
-      category:" ",
+      // tags: [],
+      // category:" ",
       image: '',
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -169,11 +171,12 @@ fastify.post('/blogs', async (req, reply) => {
         const filePath = path.join(uploadDir, filename);
         await pump(part.file, fs.createWriteStream(filePath));
         blog.image = `/uploads/${filename}`;
-      } else {
+       }
+      else {
         // Field part
         if (part.fieldname === 'tags') {
           try {
-            blog.tags = JSON.parse(part.value);  // frontend se JSON string me aayega tags
+            blog.tags =(part.value);  // frontend se JSON string me aayega tags
           } catch {
             blog.tags = [];
           }
@@ -199,33 +202,23 @@ fastify.post('/blogs', async (req, reply) => {
 //tags
 // fastify.post('/tags')
 fastify.post('/tags', async (request, reply) => {
-  try {
-    const { tags } = request.body;
-    if (!Array.isArray(tags)) {
-      return reply.status(400).send({ error: 'Tags must be an array.' });
-    }
+try{
+  const {tagName} = request.body;
 
-    const operations = tags.map(tag => ({
-      updateOne: {
-        filter: { name: tag.toLowerCase() },
-        update: { $setOnInsert: { name: tag.toLowerCase() } },
-        upsert: true,
-      }
-    }));
-
-    await fastify.mongo.db.collection('tags').bulkWrite(operations);
-    return reply.code(201).send({ success: true });
+ const tag = await tagCollection.insertOne({tagName});
+    return reply.code(201).send({ data: tag,success: true });
   } catch (error) {
     console.error(error);
     return reply.code(500).send({ error: 'Failed to save tags' });
   }
-});
+})
+
 
 
 // fastify.get('/tags')
 fastify.get('/tags', async (req, reply) => {
   try {
-    const tags = await fastify.mongo.db.collection('tags').find().toArray();
+    const tags = await tagCollection.find().toArray();
     return reply.send(tags); // [{ name: 'reactjs' }, ...]
   } catch (err) {
     console.error(err);
@@ -233,6 +226,29 @@ fastify.get('/tags', async (req, reply) => {
   }
 });
 
+
+fastify.get('/category', async (req, reply) => {
+  try {
+    const categories = await categoriesCollection.find().toArray(0);
+    return reply.send(categories); // [{ name: 'reactjs' }, ...]
+  } catch (err) {
+    console.error(err);
+    return reply.code(500).send({ error: 'Failed to fetch categories' });
+  }
+});
+
+
+fastify.post('/category', async (request, reply) => {
+try{
+  const {catName} = request.body;
+
+ const category = await categoriesCollection.insertOne({catName});
+    return reply.code(201).send({ data: category,success: true });
+  } catch (error) {
+    console.error(error);
+    return reply.code(500).send({ error: 'Failed to save categories' });
+  }
+})
 
 
 
@@ -283,7 +299,7 @@ fastify.put('/blogs/:id', async (req, reply) => {
       title: '',
       description: '',
       author: '',
-      tags: [],
+      // tags: [],
       category: '',
       updatedAt: new Date(),
     };
@@ -295,7 +311,8 @@ fastify.put('/blogs/:id', async (req, reply) => {
         const filePath = path.join(uploadDir, filename);
         await pump(part.file, fs.createWriteStream(filePath));
         updateData.image = `/uploads/${filename}`;
-      } else {
+      }
+      else {
         // Handle field part
         if (part.fieldname === 'tags') {
           try {
