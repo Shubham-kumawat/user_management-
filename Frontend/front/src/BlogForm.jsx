@@ -15,7 +15,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
-import CategorySelector from "./CategorySelector";
+
 
 // Validation Schema
 const schema = (mode) =>
@@ -37,10 +37,10 @@ const BlogForm = () => {
   const isViewMode = mode === "view";
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const [tags ,setTags]=useState([]);
+  const [category ,setCategory] =useState ([]);
   const [loading, setLoading] = useState(mode === "edit" || mode === "view");
-  const [tags, setTags] = useState([]);
-  const [category, setCategory] = useState([]);
+  
   const [users, setUsers] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -69,7 +69,7 @@ const BlogForm = () => {
  axios
       .get("http://localhost:3000/tags")
       .then((res) => setTags(res.data))
-      .catch((err) => console.error("Failed to fetch users", err));
+      .catch((err) => console.error("Failed to fetch tags", err));
 
   }, []);
 
@@ -83,9 +83,8 @@ const BlogForm = () => {
           setValue("title", title);
           setValue("description", description);
           setValue("author", author);
-          setTags(tags);
-          setCategory(category);
-
+         setValue("tags", tags);           // ✅ correct
+        setValue("category", category);
           setImagePreview(`http://localhost:3000${image}`); // backend se aaya hua image URL yahan set karo
         })
         .catch((err) => console.error("Failed to fetch blog:", err))
@@ -111,8 +110,8 @@ const BlogForm = () => {
       formData.append("title", data.title);
       formData.append("description", data.description);
       formData.append("author", data.author);
-      formData.append("tags", JSON.stringify(tags));
-      formData.append("category", category);
+      formData.append("tags", JSON.stringify(data.tags));
+formData.append("category", data.category);
 
       let response;
 
@@ -227,7 +226,7 @@ const BlogForm = () => {
       helperText={errors.author?.message}
       disabled={isViewMode}
     >
-      {users.map((user) => (
+      {(users || []).map((user) => (
         <MenuItem key={user._id} value={user.fullName}>
           {user.fullName}
         </MenuItem>
@@ -253,7 +252,8 @@ const BlogForm = () => {
       }}
 
     >
-      {category.map((cat) => (
+
+      {(category ).map((cat) => (
         <MenuItem key={cat._id} value={cat.catName}>
           {cat.catName}
         </MenuItem>
@@ -283,11 +283,11 @@ const BlogForm = () => {
       helperText={errors.tags?.message}
       disabled={isViewMode}
     >
-      {tags.map((tag) => (
-        <MenuItem key={tag._id} value={tag.tagName}>
-          {tag.tagName}
-        </MenuItem>
-      ))}
+      {(tags ).map((tag) => (
+  <MenuItem key={tag._id} value={tag.tagName}>
+    {tag.tagName}
+  </MenuItem>
+))}
     </TextField>
   )}
 />

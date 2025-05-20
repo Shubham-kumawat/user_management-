@@ -23,7 +23,11 @@ await fastify.register(cors, {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // explicitly allow DELETE
 });
 
-await fastify.register(multipart);
+await fastify.register(multipart,{
+  limits :{
+    fileSize : 10*1024*1024,
+  }
+});
 await fastify.register(db);
 const tagCollection = fastify.mongo.db.collection('tags')
 const categoriesCollection = fastify.mongo.db.collection("categories")
@@ -157,8 +161,7 @@ fastify.post('/blogs', async (req, reply) => {
       title: '',
       description: '',
       author: '',
-      // tags: [],
-      // category:" ",
+     
       image: '',
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -172,18 +175,17 @@ fastify.post('/blogs', async (req, reply) => {
         await pump(part.file, fs.createWriteStream(filePath));
         blog.image = `/uploads/${filename}`;
        }
-      else {
-        // Field part
-        if (part.fieldname === 'tags') {
-          try {
-            blog.tags =(part.value);  // frontend se JSON string me aayega tags
-          } catch {
-            blog.tags = [];
-          }
-        } else {
-          blog[part.fieldname] = part.value;
-        }
-      }
+    else {
+  if (part.fieldname === 'tags') {
+    blog.tags = JSON.parse(part.value);
+  } else if (part.fieldname === 'category') {
+    blog.category = part.value;
+  } else {
+    blog[part.fieldname] = part.value;
+  }
+}
+
+      
     }
 
     const result = await fastify.mongo.db.collection('blogs').insertOne(blog);
@@ -197,6 +199,39 @@ fastify.post('/blogs', async (req, reply) => {
     return reply.code(500).send({ error: 'Internal Server Error' });
   }
 });
+// fastify.post("/blogs", async (request, reply) => {
+//   const blog = {};
+//   let imageFilename = null;
+
+//   const parts = request.parts();
+//   for await (const part of parts) {
+//     if (part.file) {
+//       imageFilename = ${Date.now()}-${part.filename};
+//       const filePath = path.join(uploadDir, imageFilename);
+//       await pipeline(part.file, fs.createWriteStream(filePath));
+//     } else {
+//       blog[part.fieldname] = part.value;
+//     }
+//   }
+
+//   if (imageFilename) {
+//     blog.image = http://localhost:3000/uploads/${imageFilename};
+//   }
+
+//   // 🕒 Add timestamps
+//   blog.createdAt = new Date();
+//   blog.updatedAt = new Date();
+
+//   try {
+//     const result = await blogCollection.insertOne(blog);
+//     blog._id = result.insertedId;
+//     return reply.status(201).send({ data: blog, message: "Blog created", result });
+//   } catch (err) {
+//     return reply.status(500).send({ error: err.message });
+//   }
+// });
+
+
 
 
 //tags
