@@ -6,7 +6,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
         <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">
-          🏠 Home Dashboard
+           Home Dashboard
         </h1>
         <ul className="space-y-4">
           <li>
