@@ -17,14 +17,14 @@ export default function App() {
               User Table
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="/form"
               className="block bg-green-500 hover:bg-green-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
             >
               Add New User
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               to="/blogs"
@@ -33,14 +33,14 @@ export default function App() {
               Blog Table
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="/blogs/new"
               className="block bg-indigo-500 hover:bg-indigo-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
             >
               Create New Blog
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               to="/tags"
