@@ -262,26 +262,67 @@ fastify.get('/tags', async (req, reply) => {
 });
 
 
-fastify.get('/category', async (req, reply) => {
+// fastify.get('/categories', async (req, reply) => {
+//   try {
+//     const categories = await categoriesCollection.find().toArray(0);
+//     return reply.send(categories); // [{ name: 'reactjs' }, ...]
+//   } catch (err) {
+//     console.error(err);
+//     return reply.code(500).send({ error: 'Failed to fetch categories' });
+//   }
+// });
+
+
+// fastify.post('/categories', async (request, reply) => {
+// try{
+//   const {catName} = request.body;
+
+//  const categories = await categoriesCollection.insertOne({catName});
+//     return reply.code(201).send({ data: category,success: true });
+//   } catch (error) {
+//     console.error(error);
+//     return reply.code(500).send({ error: 'Failed to save categories' });
+//   }
+// })
+
+// category routes
+
+fastify.get("/categories", async (request, reply) => {
   try {
-    const categories = await categoriesCollection.find().toArray(0);
-    return reply.send(categories); // [{ name: 'reactjs' }, ...]
+    const tags = await categoriesCollection.find().toArray();
+    return reply.status(200).send(tags);
   } catch (err) {
-    console.error(err);
-    return reply.code(500).send({ error: 'Failed to fetch categories' });
+    return reply.status(500).send({ error: err.message });
   }
-});
+})
 
 
-fastify.post('/category', async (request, reply) => {
-try{
-  const {catName} = request.body;
+fastify.post("/categories", async (request, reply) => {
+  const { categoryName } = request.body;
+  try{
+    const categories = await categoriesCollection.insertOne({categoryName})
+    return reply.status(200).send({ data: categories,message: "Category created", categories})
+  }
+  catch(err){
+    return reply.status(500).send({error: err.message})
+  }
+})
 
- const category = await categoriesCollection.insertOne({catName});
-    return reply.code(201).send({ data: category,success: true });
-  } catch (error) {
-    console.error(error);
-    return reply.code(500).send({ error: 'Failed to save categories' });
+fastify.get("/categories/:categoryId", async (request, reply) => {
+  const { categoryId } = request.params;
+
+  try {
+    const category = await categoriesCollection.findOne({
+      _id: new fastify.mongo.ObjectId(categoryId),
+    });
+
+    if (!category) {
+      return reply.status(404).send({ message: "Category not found" });
+    }
+
+    return reply.status(200).send(category);
+  } catch (err) {
+    return reply.status(500).send({ error: err.message });
   }
 })
 

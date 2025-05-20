@@ -38,7 +38,7 @@ const BlogForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [tags ,setTags]=useState([]);
-  const [category ,setCategory] =useState ([]);
+  const [categories ,setCategories] =useState ([]);
   const [loading, setLoading] = useState(mode === "edit" || mode === "view");
   
   const [users, setUsers] = useState([]);
@@ -62,8 +62,8 @@ const BlogForm = () => {
       .catch((err) => console.error("Failed to fetch users", err));
 
   axios
-      .get("http://localhost:3000/category")
-      .then((res) => setCategory(res.data))
+      .get("http://localhost:3000/categories")
+      .then((res) => setCategories(res.data))
       .catch((err) => console.error("Failed to fetch users", err));
 
  axios
@@ -253,9 +253,9 @@ formData.append("category", data.category);
 
     >
 
-      {(category ).map((cat) => (
-        <MenuItem key={cat._id} value={cat.catName}>
-          {cat.catName}
+      {(categories).map((cat) => (
+        <MenuItem key={cat._id} value={cat.categoryName}>
+          {cat.categoryName}
         </MenuItem>
       ))}
     </TextField>
