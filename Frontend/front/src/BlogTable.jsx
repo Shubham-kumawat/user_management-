@@ -167,7 +167,7 @@ export default function BlogTable() {
     <div>
       <div >
            <Link
-              to="/home"
+              to="/"
               className=" w-40 mt-2 ml-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
             >
               Home Page
