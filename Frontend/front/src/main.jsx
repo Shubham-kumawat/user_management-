@@ -11,6 +11,7 @@ import BlogTable from "./BlogTable.jsx";
 import TagManager from "./TagManager.jsx";
 import CategoryManager from "./CategoriesManager.jsx";
 import AddTagForm  from "./AddTagForm.jsx";
+import AddCategoryForm from "./components/AddCategoryForm.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -48,7 +49,11 @@ const router = createBrowserRouter([
 {
   path:"/addtag",
   element:<AddTagForm/>
-}
+},
+{
+  path: "/addcategory",
+  element: <AddCategoryForm />
+},
 
 ]);
 
