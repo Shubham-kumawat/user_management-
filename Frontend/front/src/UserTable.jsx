@@ -129,7 +129,17 @@ export default function EnhancedTable() {
   };
 
   return (
+    <div>
+      <div >
+           <Link
+              to="/home"
+              className=" w-40 mt-2 ml-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
+            >
+              Home Page
+            </Link>
+      </div>
     <Box className="w-[90%] mx-auto h-[600px] mt-20 overflow-auto">
+
       <Paper sx={{ width: "100%", mb: 2 }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Typography variant="h6">User Details</Typography>
@@ -239,5 +249,6 @@ export default function EnhancedTable() {
         />
       </Paper>
     </Box>
+    </div>
   );
 }

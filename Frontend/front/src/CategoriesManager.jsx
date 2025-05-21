@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 export default function CategoryManager() {
   const [categories, setCategories] = useState([]);
@@ -21,6 +22,15 @@ export default function CategoryManager() {
   };
 
   return (
+    <div>
+      <div >
+                 <Link
+                    to="/home"
+                    className=" w-40 mt-2 ml-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
+                  >
+                    Home Page
+                  </Link>
+            </div>
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-6">
         <h2 className="text-2xl font-bold mb-6 text-blue-600">📂 Category Manager</h2>
@@ -54,6 +64,7 @@ export default function CategoryManager() {
           </table>
         )}
       </div>
+    </div>
     </div>
   );
 }

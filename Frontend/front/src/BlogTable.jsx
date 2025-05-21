@@ -34,7 +34,7 @@ import { IoFilter } from "react-icons/io5";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { useNavigate } from "react-router";
-
+import { Link } from "react-router";
 // Table headings
 const headCells = [
   { id: "title", label: "Title" },
@@ -164,6 +164,15 @@ export default function BlogTable() {
   );
 
   return (
+    <div>
+      <div >
+           <Link
+              to="/home"
+              className=" w-40 mt-2 ml-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
+            >
+              Home Page
+            </Link>
+      </div>
     <Box className="w-[90%] mx-auto mt-12">
       <Paper sx={{ width: "100%", mb: 2, p: 2 }}>
         {/* Top Controls */}
@@ -353,5 +362,6 @@ export default function BlogTable() {
         />
       </Paper>
     </Box>
+    </div>
   );
 }

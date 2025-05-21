@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import TagIcon from "@mui/icons-material/Tag";
 import CircularProgress from "@mui/material/CircularProgress";
+import { Link } from "react-router";
 
 const TagManager = () => {
   const [tags, setTags] = useState([]);
@@ -34,6 +35,16 @@ const TagManager = () => {
   };
 
   return (
+    <div>
+      <div >
+                 <Link
+                    to="/home"
+                    className=" w-40 mt-2 ml-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
+                  >
+                    Home Page
+                  </Link>
+            </div>
+
     <Box className="min-h-screen bg-gray-100 py-8 px-4">
       <Box className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-6">
         <Typography variant="h5" component="div" className="text-blue-600 font-bold flex items-center mb-6">
@@ -77,6 +88,7 @@ const TagManager = () => {
         )}
       </Box>
     </Box>
+    </div>
   );
 };
 

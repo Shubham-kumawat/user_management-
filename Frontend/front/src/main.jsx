@@ -12,7 +12,7 @@ import TagManager from "./TagManager.jsx";
 import CategoryManager from "./CategoriesManager.jsx";
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/home",
     element: <App />,
   },
 
