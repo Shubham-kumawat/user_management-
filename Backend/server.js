@@ -753,7 +753,7 @@ fastify.put('/blogs/:id', async (req, reply) => {
       title: '',
       description: '',
       author: '',
-      // tags: [],
+      tags: [],
       category: '',
       updatedAt: new Date(),
     };
