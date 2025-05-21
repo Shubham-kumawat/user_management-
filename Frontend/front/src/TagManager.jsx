@@ -41,13 +41,22 @@ const TagManager = () => {
 
   return (
     <div>
-      <div>
+      <div className=" flex justify-between">
         <Link
           to="/"
           className=" w-40 mt-2 ml-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
         >
           Home Page
         </Link>
+
+               <Link
+          to="/addtag"
+          className=" w-40 mt-2 mr-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
+        >
+          Add Tags
+        </Link>
+      
+          
       </div>
 
       <Box className="min-h-screen bg-gray-100 py-8 px-4">
