@@ -21,7 +21,7 @@ import axios from "axios";
 const headCells = [
   { id: "profile", label: "Profile" },
   { id: "phone", label: "Phone" },
-  { id: "gender", label: "Gender M/F/O" },
+  { id: "gender", label: "Gender " },
   { id: "dob", label: "DOB" },
   { id: "age", label: "Age" },
   { id: "city", label: "City" },

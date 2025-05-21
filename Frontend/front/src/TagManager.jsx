@@ -10,18 +10,16 @@ import {
   Paper,
   Typography,
   Box,
-  TextField,
-  Button,
+ 
 } from "@mui/material";
 import TagIcon from "@mui/icons-material/Tag";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Link } from "react-router"; // ✅ Corrected from "react-router"
+import { Link } from "react-router"; 
 
 const TagManager = () => {
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [newTag, setNewTag] = useState("");
-  const [adding, setAdding] = useState(false);
+ 
 
   useEffect(() => {
     fetchTags();
@@ -39,30 +37,7 @@ const TagManager = () => {
     }
   };
 
-  const handleAddTag = async () => {
-    if (!newTag.trim()) return;
-    setAdding(true);
-    try {
-      const response = await fetch("http://localhost:3000/tags", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tagName: newTag.trim() }),
-      });
-
-      if (response.ok) {
-        setNewTag("");
-        fetchTags(); // refresh list
-      } else {
-        console.error("Failed to add tag");
-      }
-    } catch (error) {
-      console.error("Error adding tag:", error);
-    } finally {
-      setAdding(false);
-    }
-  };
+ 
 
   return (
     <div>
@@ -81,25 +56,7 @@ const TagManager = () => {
             <TagIcon className="mr-2" /> All Tags
           </Typography>
 
-          {/* ✅ Add Tag Form */}
-          <Box className="flex mb-6 gap-4 items-center">
-            <TextField
-              label="New Tag"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              variant="outlined"
-              size="small"
-              className="flex-1"
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddTag}
-              disabled={adding}
-            >
-              {adding ? "Adding..." : "Add Tag"}
-            </Button>
-          </Box>
+      
 
           {loading ? (
             <Box className="flex justify-center py-10">
