@@ -155,7 +155,6 @@ export default function BlogTable() {
         appliedTags.length === 0 ||
         appliedTags.some((tag) => tags.includes(tag));
 
-      // All conditions must be true
       return matchesSearch && matchesCategory || matchesTags;
     });
   }, [blogs, searchTerm, appliedTags, appliedCategories]);

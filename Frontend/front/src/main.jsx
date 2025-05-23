@@ -32,8 +32,11 @@ const router = createBrowserRouter([
 } ,
 {path:"/blogs/new" ,element:<BlogForm /> 
 },
-{ path:"/blogs/:id", element:<BlogForm />
+{ path:"/blogs/:id", element:<BlogForm  mode = "view"/>
 } ,
+{ path:"/blogs/edit/:id", element:<BlogForm mode = "edit" />
+} ,
+
 
 { path:"/form/:id", element:<AddUserForm />
 },

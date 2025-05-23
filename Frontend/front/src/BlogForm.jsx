@@ -1,6 +1,3 @@
-
-
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -14,7 +11,7 @@ import {
 } from "@mui/material";
    import { Stack } from "@mui/material";
 import { useForm,Controller } from "react-hook-form";
-import { useNavigate, useParams, useSearchParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
@@ -34,9 +31,8 @@ const schema = (mode) =>
     author: yup.string().required("Author name is required"),
   });
 
-const BlogForm = () => {
-  const [searchParams] = useSearchParams();
-  const mode = searchParams.get("mode"); // 'edit', 'view' or null
+const BlogForm = ({mode = "create"}) => {
+  
   const isViewMode = mode === "view";
   const { id } = useParams();
   const navigate = useNavigate();
@@ -50,6 +46,7 @@ const BlogForm = () => {
   const {
     register,
     handleSubmit,
+    reset,
     setValue,
     control,
     formState: { errors },
@@ -77,24 +74,32 @@ const BlogForm = () => {
   }, []);
 
   // Fetch blog if edit/view
-  useEffect(() => {
+
+useEffect(() => {
   if ((mode === "edit" || mode === "view") && id) {
     axios
       .get(`http://localhost:3000/blogs/${id}`)
       .then((res) => {
         const { title, description, author, image, tags, category } = res.data;
 
-        setValue("title", title);
-        setValue("description", description);
-        setValue("author", author);
-        setValue("tags", tags); // must be array like ['React', 'Node']
-        setValue("category", category); // should be a string like 'Tech'
+        reset({
+          title,
+          description,
+          author,
+          tags: tags || [], 
+          category: category || "", 
+          imageFile: [], 
+        });
 
         setImagePreview(`http://localhost:3000${image}`);
       })
+      .catch((error) => {
+        console.error("Error fetching blog:", error);
+      })
       .finally(() => setLoading(false));
   }
-}, [mode, id, setValue]);
+}, [mode, id, reset]);
+
 
 
   const handleImageChange = (e) => {
@@ -122,7 +127,7 @@ formData.append("category", data.category);
 
       if (mode === "edit" && id) {
         response = await axios.put(
-          `http://localhost:3000/blogs/${id}`,
+          `http://localhost:3000/blogs//${id}`,
           formData
         );
         alert("Blog updated successfully!");
@@ -175,7 +180,7 @@ formData.append("category", data.category);
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    mb: 2,  // margin bottom for spacing
+    mb: 2, 
   }}
 >
   <input
@@ -245,58 +250,54 @@ formData.append("category", data.category);
 <Controller
   name="category"
   control={control}
+  defaultValue="" // Add default value
   rules={{ required: "Category is required" }}
   render={({ field }) => (
     <TextField
       select
       label="Select Category"
       fullWidth
-      {...field}
+      value={field.value || ""} // Ensure value is set
+      onChange={field.onChange}
       error={!!errors.category}
       helperText={errors.category?.message}
       disabled={isViewMode}
-      InputLabelProps={{
-        shrink: !!field.value, // ✅ Yeh line fix karega
-      }}
-
     >
-
-      {(categories).map((cat) => (
-  <MenuItem key={cat._id} value={cat.categoryName}>
-    {cat.categoryName}
-  </MenuItem>
-))}
-
+      {categories.map((cat) => (
+        <MenuItem key={cat._id} value={cat.categoryName}>
+          {cat.categoryName}
+        </MenuItem>
+      ))}
     </TextField>
   )}
 />
 
 
+
         {/* Tags - Multi Select */}
-        <Controller
+
+<Controller
   name="tags"
   control={control}
+  defaultValue={[]} // Add default empty array
   rules={{ required: "At least one tag is required" }}
-  InputLabelProps={{
-    shrink: true,
-  }}
   render={({ field }) => (
     <TextField
       select
       label="Select Tags"
-      defaultValue={[]}
       fullWidth
       SelectProps={{ multiple: true }}
-      {...field}
+      value={field.value || []} // Ensure value is set
+      onChange={field.onChange}
       error={!!errors.tags}
       helperText={errors.tags?.message}
       disabled={isViewMode}
     >
-      {(tags ).map((tag) => (
-  <MenuItem key={tag._id} value={tag.tagName}>
-    {tag.tagName}
-  </MenuItem>
-))}
+      {tags.map((tag) => (
+        <MenuItem key={tag._id} value={tag.tagName}>
+          {tag.tagName}
+        </MenuItem>
+      ))}
     </TextField>
   )}
 />
