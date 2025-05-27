@@ -295,18 +295,26 @@ fastify.get("/categories/:categoryId", async (request, reply) => {
 
 fastify.get('/blogs', async (request, reply) => {
   try {
-    const { page = 1, limit = 10 } = request.query;
+    const { page = 1, limit = 10,search ="" } = request.query;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const blogCollection = fastify.mongo.db.collection('blogs');
 
+    const searchQuery ={
+      $or:[{ title: { $regex: search, $options: 'i' } },
+        {content: { $regex: search, $options: 'i' }},
+       {author: { $regex: search, $options: 'i' }},
+{tags: { $regex: search, $options: 'i' }},
+  {category: { $regex: search, $options: 'i' }},
+     ] 
+    }
     const blogs = await blogCollection
-      .find()
+      .find(searchQuery)
       .skip(skip)
       .limit(parseInt(limit))
       .toArray();
 
-    const total = await blogCollection.countDocuments();
+    const total = await blogCollection.countDocuments(searchQuery);
 
     return reply.send({
       data: blogs,
