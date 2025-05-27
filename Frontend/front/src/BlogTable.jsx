@@ -53,22 +53,40 @@ export default function BlogTable() {
   const [appliedCategories, setAppliedCategories] = useState([]);
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [tempSelectedCategories, setTempSelectedCategories] = useState([]);
+const [totalBlogs, setTotalBlogs] = useState(0); // new state
 
   const openFilter = Boolean(filterAnchorEl);
   const filterPopoverId = openFilter ? "filter-popover" : undefined;
+useEffect(() => {
+  const fetchBlogs = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/blogs", {
+        params: {
+          page: page + 1, // backend is 1-based index
+          limit: rowsPerPage
+        }
+      });
+      setBlogs(res.data.data); // updated for paginated response
+      setTotalBlogs(res.data.pagination.total); // new state to hold total count
+    } catch (err) {
+      console.error("Error fetching blogs:", err);
+    }
+  };
+  fetchBlogs();
+}, [page, rowsPerPage]); // trigger on page or rowsPerPage change
 
   // Fetch blogs
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const res = await axios.get("http://localhost:3000/blogs");
-        setBlogs(res.data);
-      } catch (err) {
-        console.error("Error fetching blogs:", err);
-      }
-    };
-    fetchBlogs();
-  }, []);
+  // useEffect(() => {
+  //   const fetchBlogs = async () => {
+  //     try {
+  //       const res = await axios.get("http://localhost:3000/blogs");
+  //       setBlogs(res.data);
+  //     } catch (err) {
+  //       console.error("Error fetching blogs:", err);
+  //     }
+  //   };
+  //   fetchBlogs();
+  // }, []);
 
   // Fetch tags and categories
   useEffect(() => {
@@ -159,12 +177,12 @@ export default function BlogTable() {
     });
   }, [blogs, searchTerm, appliedTags, appliedCategories]);
 
-  const visibleRows = useMemo(() => {
-    return filteredBlogs.slice(
-      page * rowsPerPage,
-      page * rowsPerPage + rowsPerPage
-    );
-  }, [filteredBlogs, page, rowsPerPage]);
+  // const visibleRows = useMemo(() => {
+  //   return filteredBlogs.slice(
+  //     page * rowsPerPage,
+  //     page * rowsPerPage + rowsPerPage
+  //   );
+  // }, [filteredBlogs, page, rowsPerPage]);
 
   return (
     <div>
@@ -299,8 +317,8 @@ export default function BlogTable() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {visibleRows.length > 0 ? (
-                  visibleRows.map((blog) => {
+                {blogs.length > 0 ? (
+                  blogs.map((blog) => {
                     let tags = [];
                     try {
                       tags = typeof blog.tags === "string" ? JSON.parse(blog.tags) : blog.tags;
@@ -360,20 +378,19 @@ export default function BlogTable() {
               </TableBody>
             </Table>
           </TableContainer>
+<TablePagination
+  component="div"
+  count={totalBlogs}
+  page={page}
+  onPageChange={(event, newPage) => setPage(newPage)}
+  rowsPerPage={rowsPerPage}
+  onRowsPerPageChange={(event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  }}
+  rowsPerPageOptions={[5, 10, 25]}
+/>
 
-          {/* Pagination */}
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={filteredBlogs.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={(event, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(event) => {
-              setRowsPerPage(parseInt(event.target.value, 10));
-              setPage(0);
-            }}
-          />
         </Paper>
       </Box>
     </div>

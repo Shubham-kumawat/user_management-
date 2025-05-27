@@ -293,13 +293,33 @@ fastify.get("/categories/:categoryId", async (request, reply) => {
 
 
 
-fastify.get('/blogs', async (_, reply) => {
+fastify.get('/blogs', async (request, reply) => {
   try {
-    const blogs = await fastify.mongo.db.collection('blogs').find().toArray();
-    return reply.send(blogs);
+    const { page = 1, limit = 10 } = request.query;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const blogCollection = fastify.mongo.db.collection('blogs');
+
+    const blogs = await blogCollection
+      .find()
+      .skip(skip)
+      .limit(parseInt(limit))
+      .toArray();
+
+    const total = await blogCollection.countDocuments();
+
+    return reply.send({
+      data: blogs,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(total / parseInt(limit))
+      }
+    });
   } catch (err) {
     fastify.log.error(err);
-    return reply.status(500).send({ error: 'Failed to fetch users' });
+    return reply.status(500).send({ error: 'Failed to fetch blogs' });
   }
 });
 
