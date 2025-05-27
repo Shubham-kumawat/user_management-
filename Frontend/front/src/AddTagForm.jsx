@@ -1,130 +1,86 @@
-import { useState } from 'react';
-import {
-  Box,
-  TextField,
-  Button,
-  Snackbar,
-  Alert,
-  CircularProgress,
-  Paper,
-  Typography
-} from '@mui/material';
-import { Link } from "react-router";
-const AddTagForm = ({ onClose, onTagAdded }) => {
-  const [tagName, setTagName] = useState('');
+import { useState } from "react";
+import { PlusCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+
+export default function AddTagForm({ onTagAdded, onClose }) {
+  const [tagName, setTagName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [message, setMessage] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!tagName.trim()) {
-      setError('Tag name cannot be empty');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
+  const handleAddTag = async () => {
+    if (!tagName.trim()) return;
 
     try {
-      const response = await fetch('http://localhost:3000/tags', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ tagName: tagName.trim() }),
+      setLoading(true);
+      const response = await fetch("http://localhost:3000/tags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tagName }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to add tag');
+        throw new Error(data.message || "Failed to add tag");
       }
 
-      setSuccess(true);
-      setTagName('');
-
-      if (onTagAdded) onTagAdded(data);
+      setMessage("Tag added successfully!");
+      setTagName("");
+      onTagAdded?.(data);
 
       setTimeout(() => {
-        setSuccess(false);
-        onClose();
-      }, 1500);
+        setMessage(null);
+        onClose?.();
+      }, 2000);
     } catch (err) {
-      setError(err.message);
+      setMessage(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      <div>
-          <Link
-          to="/tags"
-          className=" w-40 mt-2 ml-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
-        >
-       Go Back
-        </Link>
-      </div>
-    <Box
-      sx={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: '#f0f2f5',
-      }}
-    >
-      <Paper
-        elevation={6}
-        sx={{
-          p: 4,
-          width: 400,
-          borderRadius: 3,
-          boxShadow: 3,
-        }}
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+      <Link
+        to="/tags"
+        className="mb-6 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow"
       >
-        <Typography variant="h6" gutterBottom>
-          Add New Tag
-        </Typography>
+        Go Back
+      </Link>
 
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Tag Name"
+      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Add New Tag</h2>
+        <div className="flex items-center gap-4">
+          <input
+            type="text"
+            placeholder="Enter tag name"
+            className="flex-1 border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-100 px-4 py-2 rounded-lg outline-none transition"
             value={tagName}
             onChange={(e) => setTagName(e.target.value)}
-            fullWidth
-            margin="normal"
-            error={!!error}
-            helperText={error}
             disabled={loading}
           />
+          <button
+            onClick={handleAddTag}
+            disabled={loading || !tagName.trim()}
+            className={`flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition ${
+              loading ? "opacity-60 cursor-not-allowed" : ""
+            }`}
+          >
+            <PlusCircle className="w-5 h-5" />
+            {loading ? "Adding..." : "Add"}
+          </button>
+        </div>
 
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-         
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              disabled={loading || !tagName.trim()}
-            >
-              {loading ? <CircularProgress size={24} /> : 'Add Tag'}
-            </Button>
-          </Box>
-        </form>
-
-        <Snackbar
-          open={success}
-          autoHideDuration={3000}
-          onClose={() => setSuccess(false)}
-        >
-          <Alert severity="success">Tag added successfully!</Alert>
-        </Snackbar>
-      </Paper>
-    </Box>
+        {message && (
+          <div
+            className={`mt-4 px-4 py-2 rounded text-white text-sm ${
+              message.includes("success") ? "bg-green-500" : "bg-red-500"
+            }`}
+          >
+            {message}
+          </div>
+        )}
+      </div>
     </div>
   );
-};
-
-export default AddTagForm;
+}

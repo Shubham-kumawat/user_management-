@@ -206,30 +206,36 @@ export default function EnhancedTable() {
                     <TableCell>{row.education}</TableCell>
                     <TableCell>
                       <Box display="flex" gap={1}>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          size="small"
-                          onClick={() => handleView(id)}
-                        >
-                          View
-                        </Button>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          size="small"
-                          onClick={() => handleEdit(id)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="contained"
-                          color="error"
-                          size="small"
-                          onClick={() => handleDelete(id)}
-                        >
-                          Delete
-                        </Button>
+                  
+  <Button
+    variant="outlined"
+    color="secondary"
+    size="small"
+    onClick={() => handleView(id)}
+    sx={{ textTransform: "none" }}
+  >
+    View
+  </Button>
+
+  <Button
+    variant="outlined"
+    color="primary"
+    size="small"
+    onClick={() => handleEdit(id)}
+    sx={{ textTransform: "none" }}
+  >
+    Edit
+  </Button>
+  <Button
+    variant="outlined"
+    color="error"
+    size="small"
+    onClick={() => handleDelete(id)}
+    sx={{ textTransform: "none" }}
+  >
+    Delete
+  </Button>
+
                       </Box>
                     </TableCell>
                   </TableRow>

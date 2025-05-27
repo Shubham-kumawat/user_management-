@@ -44,7 +44,7 @@ export default function CategoryManager() {
       {/* Category Manager */}
       <div className="min-h-screen bg-gray-100 p-8">
         <div className="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-6">
-          <h2 className="text-2xl font-bold mb-6 text-blue-600">📂 Category Manager</h2>
+          <h2 className="text-2xl font-bold mb-6 text-blue-600"> Category Manager</h2>
 
           {/* Add Category Form */}
           {/* <AddCategoryForm onCategoryAdded={fetchCategories} /> */}

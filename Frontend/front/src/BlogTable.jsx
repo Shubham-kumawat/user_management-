@@ -328,21 +328,24 @@ export default function BlogTable() {
                           {new Date(blog.updatedAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <Tooltip title="View">
-                            <IconButton onClick={() => navigate(`/blogs/${blog._id}`)}>
-                              <VisibilityIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Edit">
-                            <IconButton onClick={() => navigate(`/blogs/edit/${blog._id}`)}>
-                              <EditIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Delete">
-                            <IconButton onClick={() => handleDelete(blog._id)}>
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
+                        <Tooltip title="View">
+  <Button onClick={() => navigate(`/blogs/${blog._id}`)} variant="outlined" size="small">
+    View
+  </Button>
+</Tooltip>
+
+<Tooltip title="Edit">
+  <Button onClick={() => navigate(`/blogs/edit/${blog._id}`)} variant="outlined" size="small" color="primary"   sx={{ ml: 1 }}>
+    Edit
+  </Button>
+</Tooltip>
+
+<Tooltip title="Delete">
+  <Button onClick={() => handleDelete(blog._id)} variant="outlined" size="small" color="error"   sx={{ ml: 1 }}>
+    Delete
+  </Button>
+</Tooltip>
+
                         </TableCell>
                       </TableRow>
                     );
