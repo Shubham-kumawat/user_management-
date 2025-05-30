@@ -12,6 +12,8 @@ import TagManager from "./TagManager.jsx";
 import CategoryManager from "./CategoriesManager.jsx";
 import AddTagForm  from "./AddTagForm.jsx";
 import AddCategoryForm from "./components/AddCategoryForm.jsx";
+import Home from "./components/Home.jsx"
+import Explore from "./components/Explore.jsx"
 const router = createBrowserRouter([
   {
     path: "/",
@@ -57,6 +59,17 @@ const router = createBrowserRouter([
   path: "/addcategory",
   element: <AddCategoryForm />
 },
+
+{
+  path: "/uihome",
+  element: <Home />
+},
+{
+  path: "/explore/:blogId",
+  element: <Explore/>
+},
+
+
 
 ]);
 

@@ -59,6 +59,15 @@ export default function App() {
   </Link>
 </li>
 
+ <li>
+  <Link
+    to="/uihome"
+    className="block bg-green-600 hover:bg-green-900 text-white text-center py-2 px-4 rounded-lg transition duration-200"
+  >
+    blog UI
+  </Link>
+</li>
+
         </ul>
       </div>
     </div>
