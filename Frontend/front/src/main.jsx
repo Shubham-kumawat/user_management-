@@ -4,13 +4,13 @@ import "./index.css";
 import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router";
 // import Register from "./Register.jsx";
-import UserTable from "./UserTable.jsx";
-import AddUserForm from "./AddUserForm.jsx";
-import BlogForm from "./BlogForm.jsx";
-import BlogTable from "./BlogTable.jsx";
-import TagManager from "./TagManager.jsx";
-import CategoryManager from "./CategoriesManager.jsx";
-import AddTagForm  from "./AddTagForm.jsx";
+import UserTable from "./components/UserTable.jsx";
+import AddUserForm from "./components/AddUserForm.jsx";
+import BlogForm from "./components/BlogForm.jsx";
+import BlogTable from "./components/BlogTable.jsx";
+import TagManager from "./components/TagManager.jsx";
+import CategoryManager from "./components/CategoriesManager.jsx";
+import AddTagForm  from "./components/AddTagForm.jsx";
 import AddCategoryForm from "./components/AddCategoryForm.jsx";
 import Home from "./components/Home.jsx"
 import Explore from "./components/Explore.jsx"

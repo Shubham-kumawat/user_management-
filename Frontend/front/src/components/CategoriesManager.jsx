@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import AddCategoryForm from "./components/AddCategoryForm";
+import AddCategoryForm from "./AddCategoryForm";
 
 export default function CategoryManager() {
   const [categories, setCategories] = useState([]);
