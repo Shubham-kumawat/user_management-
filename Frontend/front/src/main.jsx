@@ -61,7 +61,7 @@ const router = createBrowserRouter([
 },
 
 {
-  path: "/uihome",
+  path: "/user/:id",
   element: <Home />
 },
 {

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import axios from "axios";
 
 const headCells = [
@@ -76,32 +75,24 @@ function EnhancedTableHead({ order, orderBy, onRequestSort }) {
 }
 
 export default function EnhancedTable() {
-  const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("name");
-  const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [rows, setRows] = React.useState([]);
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("name");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rows, setRows] = useState([]);
   const navigate = useNavigate();
 
- useEffect(() => {
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get("http://localhost:3000/users-with-blogs");
-      console.log("API Response:", res.data);
-      
-      // Verify data structure
-      if (res.data && res.data.length > 0) {
-        console.log("First user's blogs:", res.data[0].blogs);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/users-with-blogs");
+        setRows(res.data);
+      } catch (error) {
+        console.error("API Error:", error);
       }
-      
-      setRows(res.data);
-    } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
-    }
-  };
-  fetchUsers();
-}, []);
+    };
+    fetchUsers();
+  }, []);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -124,14 +115,7 @@ export default function EnhancedTable() {
     [order, orderBy, page, rowsPerPage, rows]
   );
 
-  const handleView = (id) => {
-    navigate(`/form/${id}?mode=view`);
-  };
-
-  const handleEdit = (id) => {
-    navigate(`/form/${id}?mode=edit`);
-  };
-
+  const handleEdit = (id) => navigate(`/form/${id}?mode=edit`);
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
@@ -167,113 +151,96 @@ export default function EnhancedTable() {
           </Toolbar>
 
           <TableContainer>
-            <Table size={dense ? "small" : "medium"}>
+            <Table size="medium">
               <EnhancedTableHead
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
               />
               <TableBody>
-                {visibleRows.map((row, index) => {
-                  const id = row._id || index;
-
-                  return (
-                    <TableRow key={id}>
-                      <TableCell padding="none">
-                        <Box display="flex" alignItems="center" gap={2}>
-                          <img
-                            src={`http://localhost:3000${row.filePath}`}
-                            alt="profile"
-                            width="50"
-                            height="50"
-                            className="rounded-full object-cover"
-                          />
-                          <Box>
-                            <Typography variant="body1" fontWeight="bold">
-                              {row.fullName}
-                            </Typography>
-                            <Typography variant="body2">{row.email}</Typography>
-                          </Box>
+                {visibleRows.map((user, index) => (
+                  <TableRow key={user._id || index}>
+                    <TableCell>
+                      <Box display="flex" alignItems="center" gap={2}>
+                        <img
+                          src={`http://localhost:3000${user.filePath}`}
+                          alt="profile"
+                          width="50"
+                          height="50"
+                          className="rounded-full object-cover"
+                        />
+                        <Box>
+                          <Typography fontWeight="bold">{user.fullName}</Typography>
+                          <Typography>{user.email}</Typography>
                         </Box>
-                      </TableCell>
+                      </Box>
+                    </TableCell>
 
-                      <TableCell>{row.phone}</TableCell>
-                      <TableCell>{row.gender}</TableCell>
-                      <TableCell>{row.dob}</TableCell>
-                      <TableCell>{row.age}</TableCell>
-                      <TableCell>{row.city}</TableCell>
-                      <TableCell>{row.university}</TableCell>
+                    <TableCell>{user.phone}</TableCell>
+                    <TableCell>{user.gender}</TableCell>
+                    <TableCell>{user.dob}</TableCell>
+                    <TableCell>{user.age}</TableCell>
+                    <TableCell>{user.city}</TableCell>
+                    <TableCell>{user.university}</TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        Blood Group: {user.bloodGroup}
+                      </Typography>
+                      <Typography variant="body2">
+                        Height: {user.height} cm
+                      </Typography>
+                      <Typography variant="body2">
+                        Weight: {user.weight} kg
+                      </Typography>
+                    </TableCell>
 
-                      <TableCell>
-                        <Typography variant="body2">
-                          Blood Group: {row.bloodGroup}
-                        </Typography>
-                        <Typography variant="body2">
-                          Height: {row.height} cm
-                        </Typography>
-                        <Typography variant="body2">
-                          Weight: {row.weight} kg
-                        </Typography>
-                      </TableCell>
-
-                      <TableCell sx={{ maxWidth: 200 }}>
-                        {row.blogs && row.blogs.length > 0 ? (
-                          <Box>
-                            {row.blogs.map((blog) => (
-                              <Typography 
-                                key={blog._id} 
-                                variant="body2"
-                                sx={{ 
-                                  whiteSpace: 'nowrap',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis'
-                                }}
-                              >
-                                • {blog.title}
-                              </Typography>
-                            ))}
-                            <Typography variant="caption">
-                              Total: {row.blogs.length} blogs
+                    <TableCell>
+                      {user.blogs && user.blogs.length > 0 ? (
+                        <Box>
+                          {user.blogs.slice(0, 2).map((blog) => (
+                            <Typography key={blog._id} variant="body2">
+                              • {blog.title}
                             </Typography>
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="textSecondary">
-                            No blogs
+                          ))}
+                          <Typography variant="caption">
+                            Total: {user.blogs.length} blogs
                           </Typography>
-                        )}
-                      </TableCell>
-
-                      <TableCell>
-                        <Box display="flex" gap={1}>
-                          <Button
-                            variant="outlined"
-                            color="secondary"
-                            size="small"
-                            onClick={() => handleView(id)}
-                          >
-                            View
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            size="small"
-                            onClick={() => handleEdit(id)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            size="small"
-                            onClick={() => handleDelete(id)}
-                          >
-                            Delete
-                          </Button>
                         </Box>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                      ) : (
+                        <Typography variant="body2" color="textSecondary">
+                          No blogs
+                        </Typography>
+                      )}
+                    </TableCell>
+
+                    <TableCell>
+                      <Box display="flex" gap={1}>
+                        <Link
+                          to={`/user/${user._id}`} // ✅ pass user ID in URL
+                          className="btn btn-sm btn-outline"
+                        >
+                          View Blog
+                        </Link>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          size="small"
+                          onClick={() => handleEdit(user._id)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDelete(user._id)}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
