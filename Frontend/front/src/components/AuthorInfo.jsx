@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import BlogDetails from "./Blog";
 import HrBar from "./Hr";
 
-const AuthorInfo = ({ title, date, layoutDirection }) => {
+const AuthorInfo = ({ title, date, name,layoutDirection }) => {
   const { blogId } = useParams();
   const [data, setData] = useState([
     {
@@ -61,15 +61,6 @@ const AuthorInfo = ({ title, date, layoutDirection }) => {
     },
   ]);
 
-  // const blogData = data.find(
-  //   (singleData) => singleData.blogId === Number(blogId)
-  // );
-  // {blogData.map((singleData)=>{
-  //   return(
-  //     blogId == singleData.blogId && title={blogData.title}
-  //   )
-  // })}
-
   return (
     <>
       <div className="text-amber-50">
@@ -85,7 +76,8 @@ const AuthorInfo = ({ title, date, layoutDirection }) => {
                 {date}
               </div>
               <div className="lg:text-[16px] text-[12px] ml-2 font-mono lg:text-center">
-                Written by Laura Kim
+               
+            {`Written by ${name}`}
               </div>
             </div>
           </div>
@@ -240,49 +232,3 @@ const AuthorInfo = ({ title, date, layoutDirection }) => {
 };
 
 export default AuthorInfo;
-// {
-/* 
-//  if (!blogData) { */
-// }
-//      <div>Blog is not found</div>
-//   } else {
-
-//       <>
-//         <div>{blogData.title}</div>
-//         <div>{blogData.date}</div>
-//         <div>
-//           <img src={blogData.image} />
-//         </div>
-//         <div>{blogData.button}</div>
-
-//          <div>
-//         <div>{Number(blogId) + 3}</div>
-//         <div>{Number(blogId) + 4}</div>
-//       </div>
-//       </>
-
-//   }
-
-//  <div>
-//           {data.map((singleData) => {
-//             return (
-//               (Number(blogId) + 4 == singleData.blogId ||
-//                 Number(blogId) + 5 == singleData.blogId) && (
-//                      <BlogDetails
-//           key={singleData.blogId}
-//           blogId={singleData.blogId}
-//           title={singleData.title}
-//           date={singleData.date}
-//           image={singleData.image}
-//           button={singleData.button}
-
-//           // layoutDirection="flex-col"
-//           // wrapperClass = "bg-green-950 border-b border-gray-600"
-//           // titleClass="text-pink-400 hover:underline"
-//           // imageClass="rounded-xl shadow-lg border-4 border-white"
-
-//         />
-//               )
-//             );
-//           })}
-//         </div>

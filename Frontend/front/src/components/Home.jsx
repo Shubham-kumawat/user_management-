@@ -13,11 +13,11 @@
 //   const[userData , setUserData] = useState()
 
 
-  
+
 //   return (
 
-    
-   
+
+
 //      <div className="bg-green-950 min-h-screen text-white">
 
 //       <HrBar />
@@ -45,6 +45,7 @@ import SubTitle from "./SubTitle";
 import FirstBlog from "./FirstBlog";
 import UserName from "./UserName";
 import axios from "axios";
+import AuthorInfo from "./AuthorInfo";
 
 function Home() {
   const { id } = useParams(); // userId from URL
@@ -76,15 +77,12 @@ function Home() {
       <UserName name={userData?.fullName || "Loading..."} />
       <ImageL imageUrl={`http://localhost:3000${userData?.filePath}`} />
 
-      <Title text={blogs[0]?.title || "No title"} />
-<SubTitle title={blogs[0]?.subTitle || "No subtitle"} />
-{/* <Description content={blogs[0]?.description || "No description"} /> */}
+      <Title/>
+      <SubTitle  />
+    
 
-      {/* Send blog title/description dynamically */}
-   
 
-      
-     
+
 
       <FirstBlog blog={blogs[0]} />
 

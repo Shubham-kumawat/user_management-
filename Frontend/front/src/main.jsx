@@ -64,10 +64,10 @@ const router = createBrowserRouter([
   path: "/user/:id",
   element: <Home />
 },
-{
-  path: "/explore/:blogId",
-  element: <Explore/>
-},
+{path:"/explore/:blogId",
+   element:<Explore /> 
+  },
+
 
 
 

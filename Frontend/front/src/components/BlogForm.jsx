@@ -27,7 +27,7 @@ const schema = (mode) =>
         return value && value.length > 0;
       }),
     title: yup.string().required("Title is required"),
-        subtitle: yup.string().required("Subtitle is required"), // ✅ Add this line
+  
 
     description: yup.string().required("Description is required"),
     author: yup.string().required("Author name is required"),
@@ -82,11 +82,11 @@ useEffect(() => {
     axios
       .get(`http://localhost:3000/blogs/${id}`)
       .then((res) => {
-        const { title,subtitle, description, author, image, tags, category } = res.data;
- console.log({ title,subtitle, description, author, tags, category }); 
+        const { title, description, author, image, tags, category } = res.data;
+ console.log({ title, description, author, tags, category }); 
    reset({
   title: title || "",
-   subtitle: subtitle || "", 
+ 
   description: description || "",
   author: author || "",
   tags: tags || [],        // ✅ safe default
@@ -121,7 +121,7 @@ useEffect(() => {
       }
 
       formData.append("title", data.title);
-      formData.append("subtitle", data.subtitle);
+    
       formData.append("description", data.description);
       formData.append("author", data.author);
       formData.append("tags", JSON.stringify(data.tags));
@@ -222,16 +222,6 @@ formData.append("category", data.category);
   }}
 />
 
-<TextField
-  label="Subtitle"
-  fullWidth
-  {...register("subtitle")}
-  error={!!errors.subtitle}
-  helperText={errors.subtitle?.message}
-  InputProps={{
-    readOnly: isViewMode
-  }}
-/>
 
 
 

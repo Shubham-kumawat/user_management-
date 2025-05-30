@@ -120,7 +120,7 @@ fastify.get('/users-with-blogs', async (request, reply) => {
             {
               $project: {
                 title: 1,
-                subtitle:1,
+               
                 createdAt: 1,
                 _id: 1
               }
@@ -247,7 +247,7 @@ fastify.post('/blogs', async (req, reply) => {
 
     const blog = {
       title: '',
-      subtitle:'',
+     
       description: '',
       author: '',
       image: '',
@@ -395,7 +395,7 @@ fastify.get('/blogs', async (request, reply) => {
       {
         $project: {
           title: 1,
-          subtitle:1,
+         
           description: 1,
           image: 1,
           createdAt: 1,
@@ -462,7 +462,7 @@ fastify.put('/blogs/:id', async (req, reply) => {
 
     const updateData = {
       title: '',
-      subtitle:'',
+     
       description: '',
       author: '',
       tags: [],
