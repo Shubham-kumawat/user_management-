@@ -96,6 +96,68 @@ fastify.get('/users', async (_, reply) => {
   }
 });
 
+
+
+fastify.get('/users-with-blogs', async (request, reply) => {
+  try {
+    // Use aggregation for better performance
+    const usersWithBlogs = await fastify.mongo.db.collection('Users').aggregate([
+      {
+        $lookup: {
+          from: "blogs",
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $eq: ["$userId", "$$userId"] },
+                    { $eq: ["$author", "$$userId"] }
+                  ]
+                }
+              }
+            },
+            {
+              $project: {
+                title: 1,
+                createdAt: 1,
+                _id: 1
+              }
+            }
+          ],
+          as: "blogs"
+        }
+      },
+      {
+        $project: {
+          fullName: 1,
+          email: 1,
+          phone: 1,
+          gender: 1,
+          dob: 1,
+          age: 1,
+          city: 1,
+          university: 1,
+          bloodGroup: 1,
+          height: 1,
+          weight: 1,
+          filePath: 1,
+          blogs: 1
+        }
+      }
+    ]).toArray();
+
+    return reply.send(usersWithBlogs);
+  } catch (err) {
+    console.error("Error in users-with-blogs:", err);
+    return reply.status(500).send({ 
+      error: "Failed to fetch users with blogs",
+      details: err.message 
+    });
+  }
+});
+
+
 // Get user by ID
 // Get user by ID - Updated to properly handle ObjectId
 fastify.get('/users/:id', async (request, reply) => {
@@ -172,6 +234,12 @@ fastify.delete('/users/:id', async (request, reply) => {
 
 
 
+// });
+
+// blog creation
+import { ObjectId } from 'mongodb';
+
+
 fastify.post('/blogs', async (req, reply) => {
   try {
     const parts = req.parts();
@@ -180,7 +248,6 @@ fastify.post('/blogs', async (req, reply) => {
       title: '',
       description: '',
       author: '',
-     
       image: '',
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -188,23 +255,21 @@ fastify.post('/blogs', async (req, reply) => {
 
     for await (const part of parts) {
       if (part.file) {
-        // File part
         const filename = `${nanoid()}.${part.filename.split('.').pop()}`;
         const filePath = path.join(uploadDir, filename);
         await pump(part.file, fs.createWriteStream(filePath));
         blog.image = `/uploads/${filename}`;
-       }
-    else {
-  if (part.fieldname === 'tags') {
-    blog.tags = JSON.parse(part.value);
-  } else if (part.fieldname === 'category') {
-    blog.category = part.value;
-  } else {
-    blog[part.fieldname] = part.value;
-  }
-}
-
-      
+      } else {
+        if (part.fieldname === 'tags') {
+          blog.tags = JSON.parse(part.value);
+        } else if (part.fieldname === 'category') {
+          blog.category = part.value;
+        } else if (part.fieldname === 'author') {
+          blog.author = new ObjectId(part.value); // 👈 Convert string to ObjectId
+        } else {
+          blog[part.fieldname] = part.value;
+        }
+      }
     }
 
     const result = await fastify.mongo.db.collection('blogs').insertOne(blog);
@@ -295,24 +360,48 @@ fastify.get("/categories/:categoryId", async (request, reply) => {
 
 fastify.get('/blogs', async (request, reply) => {
   try {
-    const { page = 1, limit = 10,search ="" } = request.query;
+    const { page = 1, limit = 10, search = "" } = request.query;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const blogCollection = fastify.mongo.db.collection('blogs');
 
-    const searchQuery ={
-      $or:[{ title: { $regex: search, $options: 'i' } },
-        {content: { $regex: search, $options: 'i' }},
-       {author: { $regex: search, $options: 'i' }},
-{tags: { $regex: search, $options: 'i' }},
-  {category: { $regex: search, $options: 'i' }},
-     ] 
-    }
-    const blogs = await blogCollection
-      .find(searchQuery)
-      .skip(skip)
-      .limit(parseInt(limit))
-      .toArray();
+    // Search query (title ya description me search)
+    const searchQuery = {
+      $or: [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ]
+    };
+
+    // Aggregation pipeline with author lookup
+    const pipeline = [
+      { $match: searchQuery },
+      { $skip: skip },
+      { $limit: parseInt(limit) },
+      {
+        $lookup: {
+          from: 'Users',               // Users collection se join karo
+          localField: 'author',        // blogs.author
+          foreignField: '_id',         // users._id
+          as: 'authorDetails'          // naya field authorDetails bnega array me
+        }
+      },
+      { $unwind: { path: '$authorDetails', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          image: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          tags: 1,
+          category: 1,
+          author: '$authorDetails.fullName'  // author field me author ka fullName aa jayega
+        }
+      }
+    ];
+
+    const blogs = await blogCollection.aggregate(pipeline).toArray();
 
     const total = await blogCollection.countDocuments(searchQuery);
 
@@ -330,6 +419,7 @@ fastify.get('/blogs', async (request, reply) => {
     return reply.status(500).send({ error: 'Failed to fetch blogs' });
   }
 });
+
 
 
 fastify.get('/blogs/:id', async (request, reply) => {

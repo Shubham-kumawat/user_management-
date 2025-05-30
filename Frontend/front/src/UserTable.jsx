@@ -14,20 +14,20 @@ import {
   Button,
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
 
 const headCells = [
   { id: "profile", label: "Profile" },
   { id: "phone", label: "Phone" },
-  { id: "gender", label: "Gender " },
+  { id: "gender", label: "Gender" },
   { id: "dob", label: "DOB" },
   { id: "age", label: "Age" },
   { id: "city", label: "City" },
   { id: "university", label: "University" },
   { id: "personalDetails", label: "Personal Details" },
-  { id: "address", label: "Address" },
+  { id: "blogs", label: "Blogs" },
   { id: "actions", label: "Actions" },
 ];
 
@@ -84,13 +84,24 @@ export default function EnhancedTable() {
   const [rows, setRows] = React.useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const res = await axios.get("http://localhost:3000/users");
+ useEffect(() => {
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/users-with-blogs");
+      console.log("API Response:", res.data);
+      
+      // Verify data structure
+      if (res.data && res.data.length > 0) {
+        console.log("First user's blogs:", res.data[0].blogs);
+      }
+      
       setRows(res.data);
-    };
-    fetchUsers();
-  }, []);
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+  };
+  fetchUsers();
+}, []);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -123,138 +134,161 @@ export default function EnhancedTable() {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
-      await axios.delete(`http://localhost:3000/users/${id}`);
-      setRows(rows.filter((row) => row._id !== id));
+      try {
+        await axios.delete(`http://localhost:3000/users/${id}`);
+        setRows(rows.filter((row) => row._id !== id));
+      } catch (error) {
+        console.error("Error deleting user:", error);
+      }
     }
   };
 
   return (
     <div>
-      <div >
-           <Link
-              to="/"
-              className=" w-40 mt-2 ml-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
-            >
-              Home Page
-            </Link>
+      <div>
+        <Link
+          to="/"
+          className="w-40 mt-2 ml-20 block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-200"
+        >
+          Home Page
+        </Link>
       </div>
-    <Box className="w-[90%] mx-auto h-[600px] mt-20 overflow-auto">
 
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Typography variant="h6">User Details</Typography>
-          <Link
-            to="/form"
-            className="inline-block px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
-          >
-            + Add User
-          </Link>
-        </Toolbar>
+      <Box className="w-[90%] mx-auto h-[600px] mt-20 overflow-auto">
+        <Paper sx={{ width: "100%", mb: 2 }}>
+          <Toolbar sx={{ justifyContent: "space-between" }}>
+            <Typography variant="h6">User Details</Typography>
+            <Link
+              to="/form"
+              className="inline-block px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+            >
+              + Add User
+            </Link>
+          </Toolbar>
 
-        <TableContainer>
-          <Table size={dense ? "small" : "medium"}>
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-            />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const id = row.id || row._id || index;
-                return (
-                  <TableRow key={id}>
-                    <TableCell padding="none">
-                      <Box display="flex" alignItems="center" gap={2}>
-                        <img
-                          src={`http://localhost:3000${row.filePath}`}
-                          alt="profile"
-                          width="50"
-                          height="50"
-                          className="rounded-full object-cover"
-                        />
-                        <Box>
-                          <Typography variant="body1" fontWeight="bold">
-                            {row.fullName}
-                          </Typography>
-                          <Typography variant="body2">{row.email}</Typography>
+          <TableContainer>
+            <Table size={dense ? "small" : "medium"}>
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+              />
+              <TableBody>
+                {visibleRows.map((row, index) => {
+                  const id = row._id || index;
+
+                  return (
+                    <TableRow key={id}>
+                      <TableCell padding="none">
+                        <Box display="flex" alignItems="center" gap={2}>
+                          <img
+                            src={`http://localhost:3000${row.filePath}`}
+                            alt="profile"
+                            width="50"
+                            height="50"
+                            className="rounded-full object-cover"
+                          />
+                          <Box>
+                            <Typography variant="body1" fontWeight="bold">
+                              {row.fullName}
+                            </Typography>
+                            <Typography variant="body2">{row.email}</Typography>
+                          </Box>
                         </Box>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{row.phone}</TableCell>
-                    <TableCell>{row.gender}</TableCell>
-                    <TableCell>{row.dob}</TableCell>
-                    <TableCell>{row.age}</TableCell>
-                    <TableCell>{row.city}</TableCell>
-                    <TableCell>{row.university}</TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        Blood Group: {row.bloodGroup}
-                      </Typography>
-                      <Typography variant="body2">
-                        Height: {row.height} cm
-                      </Typography>
-                      <Typography variant="body2">
-                        Weight: {row.weight} kg
-                      </Typography>
-                      <Typography variant="body2">
-                        Eye Color: {row.eyeColor}
-                      </Typography>
-                      <Typography variant="body2">
-                        Hair: {row.hair?.color} / {row.hair?.type}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{row.education}</TableCell>
-                    <TableCell>
-                      <Box display="flex" gap={1}>
-                  
-  <Button
-    variant="outlined"
-    color="secondary"
-    size="small"
-    onClick={() => handleView(id)}
-    sx={{ textTransform: "none" }}
-  >
-    View
-  </Button>
+                      </TableCell>
 
-  <Button
-    variant="outlined"
-    color="primary"
-    size="small"
-    onClick={() => handleEdit(id)}
-    sx={{ textTransform: "none" }}
-  >
-    Edit
-  </Button>
-  <Button
-    variant="outlined"
-    color="error"
-    size="small"
-    onClick={() => handleDelete(id)}
-    sx={{ textTransform: "none" }}
-  >
-    Delete
-  </Button>
+                      <TableCell>{row.phone}</TableCell>
+                      <TableCell>{row.gender}</TableCell>
+                      <TableCell>{row.dob}</TableCell>
+                      <TableCell>{row.age}</TableCell>
+                      <TableCell>{row.city}</TableCell>
+                      <TableCell>{row.university}</TableCell>
 
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
-    </Box>
+                      <TableCell>
+                        <Typography variant="body2">
+                          Blood Group: {row.bloodGroup}
+                        </Typography>
+                        <Typography variant="body2">
+                          Height: {row.height} cm
+                        </Typography>
+                        <Typography variant="body2">
+                          Weight: {row.weight} kg
+                        </Typography>
+                      </TableCell>
+
+                      <TableCell sx={{ maxWidth: 200 }}>
+                        {row.blogs && row.blogs.length > 0 ? (
+                          <Box>
+                            {row.blogs.map((blog) => (
+                              <Typography 
+                                key={blog._id} 
+                                variant="body2"
+                                sx={{ 
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}
+                              >
+                                • {blog.title}
+                              </Typography>
+                            ))}
+                            <Typography variant="caption">
+                              Total: {row.blogs.length} blogs
+                            </Typography>
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" color="textSecondary">
+                            No blogs
+                          </Typography>
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        <Box display="flex" gap={1}>
+                          <Button
+                            variant="outlined"
+                            color="secondary"
+                            size="small"
+                            onClick={() => handleView(id)}
+                          >
+                            View
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            size="small"
+                            onClick={() => handleEdit(id)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            size="small"
+                            onClick={() => handleDelete(id)}
+                          >
+                            Delete
+                          </Button>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+      </Box>
     </div>
   );
 }

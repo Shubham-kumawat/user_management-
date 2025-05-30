@@ -81,15 +81,15 @@ useEffect(() => {
       .get(`http://localhost:3000/blogs/${id}`)
       .then((res) => {
         const { title, description, author, image, tags, category } = res.data;
-
-        reset({
-          title,
-          description,
-          author,
-          tags: tags || [], 
-          category: category || "", 
-          imageFile: [], 
-        });
+ console.log({ title, description, author, tags, category }); 
+   reset({
+  title: title || "",
+  description: description || "",
+  author: author || "",
+  tags: tags || [],        // ✅ safe default
+  category: category || "", // ✅ safe default
+  imageFile: [],           // ✅ always defined
+});
 
         setImagePreview(`http://localhost:3000${image}`);
       })
@@ -240,7 +240,7 @@ formData.append("category", data.category);
       disabled={isViewMode}
     >
       {(users || []).map((user) => (
-        <MenuItem key={user._id} value={user.fullName}>
+        <MenuItem key={user._id} value={user._id}>
           {user.fullName}
         </MenuItem>
       ))}
@@ -257,7 +257,7 @@ formData.append("category", data.category);
       select
       label="Select Category"
       fullWidth
-      value={field.value || ""} // Ensure value is set
+      value={field.value ?? ""} // Ensure value is set
       onChange={field.onChange}
       error={!!errors.category}
       helperText={errors.category?.message}
@@ -287,7 +287,7 @@ formData.append("category", data.category);
       label="Select Tags"
       fullWidth
       SelectProps={{ multiple: true }}
-      value={field.value || []} // Ensure value is set
+      value={field.value ?? []} // Ensure value is set
       onChange={field.onChange}
       error={!!errors.tags}
       helperText={errors.tags?.message}
