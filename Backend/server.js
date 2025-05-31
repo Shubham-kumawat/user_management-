@@ -1,6 +1,3 @@
-
-
-
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
@@ -12,6 +9,7 @@ import { promisify } from 'util';
 import fs from 'fs';
 import { nanoid } from 'nanoid';
 import db from './db.js'; // MongoDB plugin
+import { ObjectId } from 'mongodb';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -234,13 +232,7 @@ fastify.delete('/users/:id', async (request, reply) => {
 });
 
 
-
-// });
-
 // blog creation
-import { ObjectId } from 'mongodb';
-
-
 fastify.post('/blogs', async (req, reply) => {
   try {
     const parts = req.parts();
@@ -452,6 +444,41 @@ fastify.get('/blogs/:id', async (request, reply) => {
   }
 });
 
+//by user id or blog
+fastify.get('/user/:userId/blogs', async (request, reply) => {
+  try {
+    const { userId } = request.params;
+    const { ObjectId } = fastify.mongo;
+
+    if (!ObjectId.isValid(userId)) {
+      return reply.status(400).send({ error: 'Invalid user ID format' });
+    }
+
+    const user = await fastify.mongo.db.collection('Users').findOne({
+      _id: new ObjectId(userId),
+    });
+
+    if (!user) {
+      return reply.status(404).send({ error: 'User not found' });
+    }
+
+    // Get all blogs by this user
+    const blogs = await fastify.mongo.db.collection('blogs')
+      .find({ author: new ObjectId(userId) })
+      .project({ title: 1, description: 1, image: 1, createdAt: 1 })
+      .toArray();
+
+    return reply.send({
+      fullName: user.fullName,
+      filePath: user.filePath || '',
+      university: user.university || '',
+      blogs,
+    });
+  } catch (err) {
+    fastify.log.error(err);
+    return reply.status(500).send({ error: 'Failed to fetch user blogs' });
+  }
+});
 
 
 fastify.put('/blogs/:id', async (req, reply) => {
@@ -526,9 +553,6 @@ fastify.delete('/blogs/:id', async (request, reply) => {
     return reply.status(500).send({ error: 'Failed to delete blog' });
   }
 });
-
-
-
 
 
 // Start the server

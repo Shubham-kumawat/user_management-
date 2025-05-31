@@ -13,7 +13,9 @@ import CategoryManager from "./components/CategoriesManager.jsx";
 import AddTagForm  from "./components/AddTagForm.jsx";
 import AddCategoryForm from "./components/AddCategoryForm.jsx";
 import Home from "./components/Home.jsx"
-import Explore from "./components/Explore.jsx"
+import FirstBlog from "./components/FirstBlog.jsx"
+import AuthorInfo from "./components/AuthorInfo.jsx"
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -64,10 +66,11 @@ const router = createBrowserRouter([
   path: "/user/:id",
   element: <Home />
 },
-{path:"/explore/:blogId",
-   element:<Explore /> 
-  },
+{ path: "/user/:userId/blogs", element: <FirstBlog />  },
 
+
+{path:"/blog/:blogId", 
+  element:<AuthorInfo />}
 
 
 

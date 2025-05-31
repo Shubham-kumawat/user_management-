@@ -216,10 +216,10 @@ export default function EnhancedTable() {
                     <TableCell>
                       <Box display="flex" gap={1}>
                         <Link
-                          to={`/user/${user._id}`} // ✅ pass user ID in URL
-                          className="btn btn-sm btn-outline"
+                          to={`/user/${user._id}`}
+                          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                         >
-                          View Blog
+                          View Blogs
                         </Link>
                         <Button
                           variant="outlined"
