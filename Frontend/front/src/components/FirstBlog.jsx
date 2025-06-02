@@ -34,8 +34,9 @@ const FirstBlog = () => {
             blogId={blog._id}
             date={new Date(blog.createdAt).toLocaleDateString()}
             title={blog.title}
+            description={blog.description}
             image={`http://localhost:3000${blog.image}`}
-            button="Read More"
+            button="Explore Deeper"
           />
         ))
       ) : (

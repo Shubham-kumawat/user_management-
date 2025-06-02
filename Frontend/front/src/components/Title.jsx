@@ -30,7 +30,7 @@ const Title = () =>{
         <>
            
         <div  ref={ref} className="lg:flex animate-fade-in duration-500 delay-300 lg:flex-col">
-                <div className=" lg:ml-130   lg:w-1/1 lg:p-2 ml-4  text-2xl  xl:max-w-250  xl:text-3xl lg:text-2xl text-amber-100  mt-4 ">
+                <div className=" lg:ml-130   lg:w-1/1 lg:p-2 ml-4  text-2xl  xl:max-w-250  xl:text-4xl lg:text-4xl text-grey-100  mt-4 ">
                     Laura Kim is an illustrator and journalist who explores the relationship between the individual and the collective. Her photo essays, rendered in a style reminiscent of historic scientific illustrations, delve into complex emotions such as joy. 
                 </div>
                 <div className=" lg:relative h-[px] w-[43px] ml-4  lg:mx-auto lg:ml-96 lg:w-[43px] lg:h-[51px] ">
@@ -45,5 +45,4 @@ const Title = () =>{
 
 export default Title
 
-Title.jsx
 
