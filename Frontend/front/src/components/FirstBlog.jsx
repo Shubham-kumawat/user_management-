@@ -40,7 +40,7 @@ const FirstBlog = () => {
           />
         ))
       ) : (
-        <div className="text-amber-50 p-8">No blogs found for this user.</div>
+        <div className="text-amber-50  lg:mt-5 p-2">No blogs found for this user.</div>
       )}
     </div>
   );
